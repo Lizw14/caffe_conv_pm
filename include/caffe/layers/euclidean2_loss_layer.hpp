@@ -1,0 +1,8 @@
+//
+// Created by fanliwen on 2016/12/19.
+//
+
+#ifndef CAFFE_EUCLIDEAN2_LOSS_LAYER_H
+#define CAFFE_EUCLIDEAN2_LOSS_LAYER_H
+
+#endif //CAFFE_EUCLIDEAN2_LOSS_LAYER_H
