@@ -14,8 +14,8 @@
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/vision_layers.hpp"
 #include "caffe/proto/caffe.pb.h"
+#include "caffe/layers/roi_pooling_layer.hpp"
 
 using std::max;
 using std::min;
@@ -34,10 +34,8 @@ namespace caffe {
 	void ROIPoolingLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top) {
 			ROIPoolingParameter roi_pool_param = this->layer_param_.roi_pooling_param();
-			CHECK_GT(roi_pool_param.pooled_h(), 0)
-				<< "pooled_h must be > 0";
-			CHECK_GT(roi_pool_param.pooled_w(), 0)
-				<< "pooled_w must be > 0";
+			CHECK_GT(roi_pool_param.pooled_h(), 0) << "pooled_h must be > 0";
+			CHECK_GT(roi_pool_param.pooled_w(), 0) << "pooled_w must be > 0";
 			pooled_height_ = roi_pool_param.pooled_h();
 			pooled_width_ = roi_pool_param.pooled_w();
 			spatial_scale_ = roi_pool_param.spatial_scale();
@@ -95,14 +93,10 @@ namespace caffe {
 							// Compute pooling region for this output unit:
 							//  start (included) = floor(ph * roi_height / pooled_height_)
 							//  end (excluded) = ceil((ph + 1) * roi_height / pooled_height_)
-							int hstart = static_cast<int>(floor(static_cast<Dtype>(ph)
-								* bin_size_h));
-							int wstart = static_cast<int>(floor(static_cast<Dtype>(pw)
-								* bin_size_w));
-							int hend = static_cast<int>(ceil(static_cast<Dtype>(ph + 1)
-								* bin_size_h));
-							int wend = static_cast<int>(ceil(static_cast<Dtype>(pw + 1)
-								* bin_size_w));
+							int hstart = static_cast<int>(floor(static_cast<Dtype>(ph) * bin_size_h));
+							int wstart = static_cast<int>(floor(static_cast<Dtype>(pw) * bin_size_w));
+							int hend = static_cast<int>(ceil(static_cast<Dtype>(ph + 1) * bin_size_h));
+							int wend = static_cast<int>(ceil(static_cast<Dtype>(pw + 1) * bin_size_w));
 
 							hstart = min(max(hstart + roi_start_h, 0), height_);
 							hend = min(max(hend + roi_start_h, 0), height_);

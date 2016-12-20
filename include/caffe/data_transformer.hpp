@@ -4,7 +4,6 @@
 #include <vector>
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
-using namespace cv;
 
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
@@ -39,7 +38,7 @@ class DataTransformer {
    *    set_cpu_data() is used. See data_layer.cpp for an example.
    */
   void Transform(const Datum& datum, Blob<Dtype>* transformed_blob);
-  void Transform_nv(const Datum& datum, Blob<Dtype>* transformed_blob, Blob<Dtype>* transformed_label_blob, int cnt); //image and label
+
   /**
    * @brief Applies the transformation defined in the data layer's
    * transform_param block to a vector of Datum.
@@ -130,21 +129,24 @@ class DataTransformer {
   vector<int> InferBlobShape(const cv::Mat& cv_img);
 #endif  // USE_OPENCV
 
+  //image and label
+  void Transform_nv(const Datum& datum, Blob<Dtype>* transformed_blob, Blob<Dtype>* transformed_label_blob, int cnt);
+
   struct AugmentSelection {
     bool flip;
     float degree;
-    Size crop;
+    cv::Size crop;
     float scale;
   };
 
   struct Joints {
-    vector<Point2f> joints;
+    vector<cv::Point2f> joints;
     vector<int> isVisible;
   };
 
   struct MetaData {
     string dataset;
-    Size img_size;
+    cv::Size img_size;
     bool isValidation;
     int numOtherPeople;
     int people_index;
@@ -152,24 +154,24 @@ class DataTransformer {
     int write_number;
     int total_write_number;
     int epoch;
-    Point2f objpos; //objpos_x(float), objpos_y (float)
+    cv::Point2f objpos; //objpos_x(float), objpos_y (float)
     float scale_self;
     Joints joint_self; //(3*16)
 
-    vector<Point2f> objpos_other; //length is numOtherPeople
+    vector<cv::Point2f> objpos_other; //length is numOtherPeople
     vector<float> scale_other; //length is numOtherPeople
     vector<Joints> joint_others; //length is numOtherPeople
   };
 
-  void generateLabelMap(Dtype*, Mat&, MetaData meta);
-  void visualize(Mat& img, MetaData meta, AugmentSelection as);
+  void generateLabelMap(Dtype*, cv::Mat&, MetaData meta);
+  void visualize(cv::Mat& img, MetaData meta, AugmentSelection as);
 
-  bool augmentation_flip(Mat& img, Mat& img_aug, MetaData& meta);
-  float augmentation_rotate(Mat& img_src, Mat& img_aug, MetaData& meta);
-  float augmentation_scale(Mat& img, Mat& img_temp, MetaData& meta);
-  Size augmentation_croppad(Mat& img_temp, Mat& img_aug, MetaData& meta);
-  void RotatePoint(Point2f& p, Mat R);
-  bool onPlane(Point p, Size img_size);
+  bool augmentation_flip(cv::Mat& img, cv::Mat& img_aug, MetaData& meta);
+  float augmentation_rotate(cv::Mat& img_src, cv::Mat& img_aug, MetaData& meta);
+  float augmentation_scale(cv::Mat& img, cv::Mat& img_temp, MetaData& meta);
+  cv::Size augmentation_croppad(cv::Mat& img_temp, cv::Mat& img_aug, MetaData& meta);
+  void RotatePoint(cv::Point2f& p, cv::Mat R);
+  bool onPlane(cv::Point p, cv::Size img_size);
   void swapLeftRight(Joints& j);
   void SetAugTable(int numData);
 
@@ -191,16 +193,17 @@ class DataTransformer {
   virtual int Rand(int n);
 
   void Transform(const Datum& datum, Dtype* transformed_data);
+
   void Transform_nv(const Datum& datum, Dtype* transformed_data, Dtype* transformed_label, int cnt);
   void ReadMetaData(MetaData& meta, const string& data, size_t offset3, size_t offset1);
   void TransformMetaJoints(MetaData& meta);
   void TransformJoints(Joints& joints);
-  void clahe(Mat& img, int, int);
-  void putGaussianMaps(Dtype* entry, Point2f center, int stride, int grid_x, int grid_y, float sigma);
-  void dumpEverything(Dtype* transformed_data, Dtype* transformed_label, MetaData);
+  void clahe(cv::Mat& img, int, int);
+  void putGaussianMaps(Dtype* entry, cv::Point2f center, int stride, int grid_x, int grid_y, float sigma);
 
   // Tranformation parameters
   TransformationParameter param_;
+
 
   shared_ptr<Caffe::RNG> rng_;
   Phase phase_;

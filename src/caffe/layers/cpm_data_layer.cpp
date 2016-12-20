@@ -1,19 +1,12 @@
 #ifdef USE_OPENCV
 #include <opencv2/core/core.hpp>
 #endif  // USE_OPENCV
-#include <stdint.h>
-
-#include <vector>
-#include <string>
 
 #include "caffe/common.hpp"
-#include "caffe/data_layers.hpp"
 #include "caffe/layer.hpp"
-#include "caffe/proto/caffe.pb.h"
 #include "caffe/util/benchmark.hpp"
 #include "caffe/util/io.hpp"
-#include "caffe/util/math_functions.hpp"
-#include "caffe/util/rng.hpp"
+#include "caffe/layers/cpm_data_layer.hpp"
 
 namespace caffe {
 
@@ -156,17 +149,12 @@ void CPMDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     if (datum.encoded()) {
       this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
     } else {
-      this->data_transformer_->Transform_nv(datum, 
-        &(this->transformed_data_),
-        &(this->transformed_label_), cnt);
+      this->data_transformer_->Transform_nv(datum, &(this->transformed_data_), &(this->transformed_label_), cnt);
       ++cnt;
     }
-    // if (this->output_labels_) {
-    //   top_label[item_id] = datum.label();
-    // }
     trans_time += timer.MicroSeconds();
 
-    reader_.free().push(const_cast<Datum*>(&datum));
+    reader_.free().push(&datum);
   }
   batch_timer.Stop();
 

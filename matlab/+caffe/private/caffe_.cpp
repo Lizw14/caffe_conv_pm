@@ -14,10 +14,8 @@
 #include <vector>
 
 #include "mex.h"
-//#include "gpu/mxGPUArray.h"
 
 #include "caffe/caffe.hpp"
-
 
 #define MEX_ARGS int nlhs, mxArray **plhs, int nrhs, const mxArray **prhs
 
@@ -404,12 +402,9 @@ static void blob_copy_data(MEX_ARGS) {
     "Usage: caffe_('blob_copy_data', hBlob_to, hBlob_from)");
   Blob<float>* blob_to = handle_to_ptr<Blob<float> >(prhs[0]);
   Blob<float>* blob_from = handle_to_ptr<Blob<float> >(prhs[1]);
-  //mxCHECK(blob_from->count() == blob_to->count(),
-  //  "number of elements in target blob doesn't match that in source blob");
   
   blob_to->CopyFrom(*blob_from, false, true); 
 }
-
 
 // Usage: caffe_('blob_get_data', hBlob)
 static void blob_get_data(MEX_ARGS) {
