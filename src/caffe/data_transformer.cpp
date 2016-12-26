@@ -159,8 +159,21 @@ void DataTransformer<Dtype>::TransformMetaJoints(MetaData& meta) {
 
 template<typename Dtype>
 void DataTransformer<Dtype>::TransformJoints(Joints& j) {
+  //MPII R leg: 0(ankle), 1(knee), 2(hip)
+  //     L leg: 5(ankle), 4(knee), 3(hip)
+  //     R arms: 10(wrist), 11(elbow), 12(shoulder)
+  //     L arms: 15(wrist), 14(elbow), 13(shoulder)
+  //     6 - pelvis, 7 - thorax, 8 - upper neck, 9 - head top
   Joints jo = j;
-  if(np == 14){
+  if(np == 13){
+    jo.joints.resize(np);
+    jo.isVisible.resize(np);
+    for(int i=0;i<np;i++){
+      jo.joints[i] = j.joints[i];
+      jo.isVisible[i] = j.isVisible[i];
+    }
+  }
+  else if(np == 14){
     int MPI_to_ours[14] = {9, 8, 12, 11, 10, 13, 14, 15, 2, 1, 0, 3, 4, 5};
     jo.joints.resize(np);
     jo.isVisible.resize(np);
@@ -578,6 +591,9 @@ void DataTransformer<Dtype>::swapLeftRight(Joints& j) {
       j.isVisible[ri] = j.isVisible[li];
       j.isVisible[li] = temp_v;
     }
+  }
+  else if (np == 13) {
+
   }
   else if(np == 14){
     int right[6] = {3,4,5,9,10,11}; //1-index
