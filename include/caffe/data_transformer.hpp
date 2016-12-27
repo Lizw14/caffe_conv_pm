@@ -2,8 +2,6 @@
 #define CAFFE_DATA_TRANSFORMER_HPP
 
 #include <vector>
-#include <opencv2/core/core.hpp>
-#include <opencv2/opencv.hpp>
 
 #include "caffe/blob.hpp"
 #include "caffe/common.hpp"
@@ -141,7 +139,6 @@ class DataTransformer {
   virtual int Rand(int n);
 
   void Transform(const Datum& datum, Dtype* transformed_data);
-
   // Tranformation parameters
   TransformationParameter param_;
 

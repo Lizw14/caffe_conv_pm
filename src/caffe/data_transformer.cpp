@@ -1,16 +1,8 @@
 #ifdef USE_OPENCV
 #include <opencv2/core/core.hpp>
-#include <opencv2/contrib/contrib.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #endif  // USE_OPENCV
 
-#include <iostream>
-#include <algorithm>
-#include <fstream>
-using namespace std;
-
 #include <string>
-#include <sstream>
 #include <vector>
 
 #include "caffe/data_transformer.hpp"
@@ -188,7 +180,6 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
   Dtype* transformed_data = transformed_blob->mutable_cpu_data();
   Transform(datum, transformed_data);
 }
-
 
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(const vector<Datum> & datum_vector,
@@ -548,7 +539,6 @@ int DataTransformer<Dtype>::Rand(int n) {
       static_cast<caffe::rng_t*>(rng_->generator());
   return ((*rng)() % n);
 }
-
 
 INSTANTIATE_CLASS(DataTransformer);
 

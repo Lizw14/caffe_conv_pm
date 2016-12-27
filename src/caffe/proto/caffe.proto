@@ -1247,7 +1247,6 @@ message SPPParameter {
   optional Engine engine = 6 [default = DEFAULT];
 }
 
-
 // DEPRECATED: use LayerParameter.
 message V1LayerParameter {
   repeated string bottom = 2;
