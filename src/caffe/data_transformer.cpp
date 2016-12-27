@@ -593,7 +593,16 @@ void DataTransformer<Dtype>::swapLeftRight(Joints& j) {
     }
   }
   else if (np == 13) {
-
+    int right[5] = {2,4,6,9,11};
+    int left[5] = {3,5,7,10,12};
+    for(int i = 0; i<5; i++){
+      cv::Point2f temp = j.joints[right[i]];
+      j.joints[right[i]] = j.joints[left[i]];
+      j.joints[left[i]] = temp;
+      int temp_v = j.isVisible[right[i]];
+      j.isVisible[right[i]] = j.isVisible[left[i]]
+      j.isVisible[left[i]] = temp_v;
+    }
   }
   else if(np == 14){
     int right[6] = {3,4,5,9,10,11}; //1-index
