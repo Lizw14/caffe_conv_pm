@@ -7,6 +7,9 @@
 
 #include "caffe/data_transformer.hpp"
 
+#include "opencv2/core/core.hpp"
+#include "opencv2/opencv.hpp"
+
 namespace caffe {
 
     template <typename Dtype>
