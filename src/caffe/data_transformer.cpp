@@ -600,7 +600,7 @@ void DataTransformer<Dtype>::swapLeftRight(Joints& j) {
       j.joints[right[i]] = j.joints[left[i]];
       j.joints[left[i]] = temp;
       int temp_v = j.isVisible[right[i]];
-      j.isVisible[right[i]] = j.isVisible[left[i]]
+      j.isVisible[right[i]] = j.isVisible[left[i]];
       j.isVisible[left[i]] = temp_v;
     }
   }
