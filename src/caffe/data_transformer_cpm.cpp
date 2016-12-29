@@ -172,7 +172,15 @@ namespace caffe {
     template<typename Dtype>
     void DataTransformerCPM<Dtype>::TransformJoints(Joints& j) {
         Joints jo = j;
-        if(np == 14){
+        if(np == 13){
+            jo.joints.resize(np);
+            jo.isVisible.resize(np);
+            for(int i=0;i<np;i++){
+                jo.joints[i] = j.joints[i];
+                jo.isVisible[i] = j.isVisible[i];
+            }
+        }
+        else if(np == 14){
             int MPI_to_ours[14] = {9, 8, 12, 11, 10, 13, 14, 15, 2, 1, 0, 3, 4, 5};
             jo.joints.resize(np);
             jo.isVisible.resize(np);
@@ -424,6 +432,18 @@ namespace caffe {
                 int temp_v = j.isVisible[ri];
                 j.isVisible[ri] = j.isVisible[li];
                 j.isVisible[li] = temp_v;
+            }
+        }
+        else if (np == 13) {
+            int right[5] = {2,4,6,9,11};
+            int left[5] = {3,5,7,10,12};
+            for(int i = 0; i<5; i++){
+                cv::Point2f temp = j.joints[right[i]];
+                j.joints[right[i]] = j.joints[left[i]];
+                j.joints[left[i]] = temp;
+                int temp_v = j.isVisible[right[i]];
+                j.isVisible[right[i]] = j.isVisible[left[i]];
+                j.isVisible[left[i]] = temp_v;
             }
         }
         else if(np == 14){
