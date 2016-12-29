@@ -13,7 +13,7 @@ namespace caffe {
 template <typename Dtype>
 CPMDataLayer<Dtype>::CPMDataLayer(const LayerParameter& param)
   : BasePrefetchingDataLayer<Dtype>(param),
-    reader_(param, true) {
+    reader_(param) {
 }
 
 template <typename Dtype>
@@ -24,12 +24,15 @@ CPMDataLayer<Dtype>::~CPMDataLayer() {
 template <typename Dtype>
 void CPMDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
-  
+  this->data_transformer_.reset(
+          new DataTransformerCPM<Dtype>(this->transform_param_, this->phase_));
+  this->data_transformer_->InitRand();
+
   // Read a data point, and use it to initialize the top blob.
   Datum& datum = *(reader_.full().peek());
   LOG(INFO) << datum.height() << " " << datum.width() << " " << datum.channels();
 
-  bool force_color = this->layer_param_.cpmdata_param().force_encoded_color();
+  bool force_color = this->layer_param_.data_param().force_encoded_color();
   if ((force_color && DecodeDatum(&datum, true)) ||
       DecodeDatumNative(&datum)) {
     LOG(INFO) << "Decoding Datum";
@@ -37,7 +40,7 @@ void CPMDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
 
   // image
   const int crop_size = this->layer_param_.transform_param().crop_size();
-  const int batch_size = this->layer_param_.cpmdata_param().batch_size();
+  const int batch_size = this->layer_param_.data_param().batch_size();
   if (crop_size > 0) {
     top[0]->Reshape(batch_size, datum.channels(), crop_size, crop_size);
     for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
@@ -93,9 +96,9 @@ void CPMDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
   CHECK(this->transformed_data_.count());
 
   // Reshape on single input batches for inputs of varying dimension.
-  const int batch_size = this->layer_param_.cpmdata_param().batch_size();
+  const int batch_size = this->layer_param_.data_param().batch_size();
   const int crop_size = this->layer_param_.transform_param().crop_size();
-  bool force_color = this->layer_param_.cpmdata_param().force_encoded_color();
+  bool force_color = this->layer_param_.data_param().force_encoded_color();
   if (batch_size == 1 && crop_size == 0) {
     Datum& datum = *(reader_.full().peek());
     if (datum.encoded()) {
@@ -146,11 +149,13 @@ void CPMDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
     const int offset_label = batch->label_.offset(item_id);
     this->transformed_data_.set_cpu_data(top_data + offset_data);
     this->transformed_label_.set_cpu_data(top_label + offset_label);
+
+    DataTransformerCPM<Dtype>* data_transformer = (DataTransformerCPM<Dtype> *) this->data_transformer_.operator->();
     if (datum.encoded()) {
-      this->data_transformer_->Transform(cv_img, &(this->transformed_data_));
+        data_transformer->Transform(cv_img, &(this->transformed_data_));
     } else {
-      this->data_transformer_->Transform_nv(datum, &(this->transformed_data_), &(this->transformed_label_), cnt);
-      ++cnt;
+        data_transformer->Transform_nv(datum, &(this->transformed_data_), &(this->transformed_label_), cnt);
+        ++cnt;
     }
     trans_time += timer.MicroSeconds();
 

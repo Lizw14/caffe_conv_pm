@@ -8,6 +8,7 @@
 #include <vector>
 #include "caffe/data_reader.hpp"
 #include "caffe/layers/base_data_layer.hpp"
+#include "caffe/data_transformer_cpm.hpp"
 
 namespace caffe {
 
