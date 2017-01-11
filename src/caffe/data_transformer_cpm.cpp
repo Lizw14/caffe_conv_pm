@@ -180,6 +180,15 @@ namespace caffe {
                 jo.isVisible[i] = j.isVisible[i];
             }
         }
+        else if(np == 14 && is_dataset_zero){
+            int Zero_to_ours[14] = {0, 1, 2, 4, 6, 3, 5, 7, 8, 9, 11, 8, 10, 12};
+            jo.joints.resize(np);
+            jo.isVisible.resize(np);
+            for(int i=0;i<np;i++){
+                jo.joints[i] = j.joints[Zero_to_ours[i]];
+                jo.isVisible[i] = j.isVisible[Zero_to_ours[i]];
+            }
+        }
         else if(np == 14){
             int MPI_to_ours[14] = {9, 8, 12, 11, 10, 13, 14, 15, 2, 1, 0, 3, 4, 5};
             jo.joints.resize(np);
@@ -217,6 +226,7 @@ namespace caffe {
         np_in_lmdb = this->param_.np_in_lmdb();
         np = this->param_.num_parts();
         is_table_set = false;
+        is_dataset_zero = this->param_.is_dataset_zero();
     }
 
     template<typename Dtype>
