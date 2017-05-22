@@ -457,7 +457,7 @@ message TransformationParameter {
   optional string aug_way = 33 [default = "rand"];
   optional uint32 gray = 34 [default = 0];
   optional uint32 np_in_lmdb = 35 [default = 16];
-  optional bool is_order_correct = 36 [default = false];
+  optional bool is_dataset_zero = 36 [default = false];
   optional bool transform_body_joint = 38 [default = true];
 }
 

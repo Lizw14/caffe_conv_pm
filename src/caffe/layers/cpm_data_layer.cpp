@@ -54,6 +54,7 @@ void CPMDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
     const int width = this->phase_ != TRAIN ? datum.width() :
       this->layer_param_.transform_param().crop_size_x();
     LOG(INFO) << "PREFETCH_COUNT is " << this->PREFETCH_COUNT;
+	LOG(INFO) << "height, width" << height<< width;
     top[0]->Reshape(batch_size, datum.channels(), height, width);
     for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
       this->prefetch_[i].data_.Reshape(batch_size, datum.channels(), height, width);
@@ -63,6 +64,9 @@ void CPMDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
   LOG(INFO) << "output data size: " << top[0]->num() << ","
       << top[0]->channels() << "," << top[0]->height() << ","
       << top[0]->width();
+  LOG(INFO) << "output data size: " << this->prefetch_[1].data_.num() << ","
+      << this->prefetch_[1].data_.channels() << "," << this->prefetch_[1].data_.height() << ","
+      << this->prefetch_[1].data_.width();
 
   // label
   if (this->output_labels_) {
@@ -152,8 +156,10 @@ void CPMDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
 
     DataTransformerCPM<Dtype>* data_transformer = (DataTransformerCPM<Dtype> *) this->data_transformer_.operator->();
     if (datum.encoded()) {
+        //LOG(INFO) << "datum.encoded true";
         data_transformer->Transform(cv_img, &(this->transformed_data_));
     } else {
+        //LOG(INFO) << "datum.encoded false: " << cnt;
         data_transformer->Transform_nv(datum, &(this->transformed_data_), &(this->transformed_label_), cnt);
         ++cnt;
     }

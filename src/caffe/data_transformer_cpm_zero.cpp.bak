@@ -180,17 +180,13 @@ namespace caffe {
                 jo.isVisible[i] = j.isVisible[i];
             }
         }
-        else if(np == 14 && is_order_correct){
-			/*
-			0head 1neck
-			R: 2shoulder 3elbow 4wrist 8waist 9knee 10ankle
-			L: 5shoulder 6elbow 7wrist 11waist 12knee 13ankle
-			*/
+        else if(np == 14 && is_dataset_zero){
+            int Zero_to_ours[14] = {0, 1, 2, 4, 6, 3, 5, 7, 8, 9, 11, 8, 10, 12};
             jo.joints.resize(np);
             jo.isVisible.resize(np);
             for(int i=0;i<np;i++){
-                jo.joints[i] = j.joints[i];
-                jo.isVisible[i] = j.isVisible[i];
+                jo.joints[i] = j.joints[Zero_to_ours[i]];
+                jo.isVisible[i] = j.isVisible[Zero_to_ours[i]];
             }
         }
         else if(np == 14){
@@ -230,7 +226,7 @@ namespace caffe {
         np_in_lmdb = this->param_.np_in_lmdb();
         np = this->param_.num_parts();
         is_table_set = false;
-        is_order_correct = this->param_.is_order_correct();
+        is_dataset_zero = this->param_.is_dataset_zero();
     }
 
     template<typename Dtype>
@@ -357,16 +353,18 @@ namespace caffe {
         if(dice > this->param_.scale_prob()) {
             img_temp = img_src.clone();
             scale_multiplier = 1;
+            LOG(INFO) << "case 1:" << scale_multiplier;
         }
         else {
             float dice2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX); //[0,1]
             scale_multiplier = (this->param_.scale_max() - this->param_.scale_min()) * dice2 + this->param_.scale_min(); //linear shear into [scale_min, scale_max]
+            LOG(INFO) << "case 2:" << scale_multiplier;
         }
         float scale_abs = this->param_.target_dist()/meta.scale_self;
         float scale = scale_abs * scale_multiplier;
-        //LOG(INFO) << "before CV::resize: " << scale_multiplier << " scale:" << scale << " scale_abs:" << scale_abs;
+        LOG(INFO) << "before resize:" << scale_multiplier << "scale" << scale << "scale_abs" << scale_abs;
         cv::resize(img_src, img_temp, cv::Size(), scale, scale, cv::INTER_CUBIC);
-        //LOG(INFO) << "resize finished";
+        LOG(INFO) << "resize finished" << scale_multiplier;
         //modify meta data
         meta.objpos *= scale;
         for(int i=0; i<np; i++){
@@ -378,6 +376,7 @@ namespace caffe {
                 meta.joint_others[p].joints[i] *= scale;
             }
         }
+        LOG(INFO) << "augmentation_scale finished" << scale_multiplier;
         return scale_multiplier;
     }
 

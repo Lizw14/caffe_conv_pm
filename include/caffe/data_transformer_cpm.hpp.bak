@@ -67,7 +67,7 @@ namespace caffe {
         int np_in_lmdb;
         int np;
         bool is_table_set;
-        bool is_order_correct;
+        bool is_dataset_zero;
         vector<vector<float> > aug_degs;
         vector<vector<int> > aug_flips;
 
